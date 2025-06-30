@@ -1,23 +1,27 @@
-const express= require('express')
+const express= require('express');
+const User=require('./modals/user')
+
+const connectDB=require('./config/database')
 const app= express();
-app.use('/test/2',(req,res)=>{
-    res.send('testing sabna')
+app.use(express.json())// middlware
+
+app.post('/signup',async(req,res)=>{
+    //creating new instance  of the user modal
+    console.log(req.body,'req.body=====>')
+
+    const user=new User(req.body)
+    console.log(user,'user=====>')
+    await user.save();
+    res.send('user added successfully')
 })
 
-app.get('/user',(req,res)=>{
-res.send({firstName:'sabna',lastName:'v v'})
+connectDB().then(()=>{
+    console.log('Database connection is established')
+    app.listen(3000,()=>{
+        console.log('Server Statrted in port 3000...');
+    });
 })
-app.post('/user',(req,res)=>{
-    res.send('data save to db')
-})
-app.delete('/user',(req,res)=>{
-    res.send('data deleted successfully')
-})
+.catch((err)=>{
 
-app.use('/test',(req,res)=>{
-    res.send('heloo from the user')
+    console.log('Database cannot be connected',err.message)
 })
-
-app.listen(3000,()=>{
-    console.log('Server Statrted in port 3000...');
-});
