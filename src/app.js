@@ -14,6 +14,45 @@ app.post('/signup',async(req,res)=>{
     await user.save();
     res.send('user added successfully')
 })
+// get api for one user
+
+app.get('/user',async(req,res)=>{
+    const userEmail= req.body.emailId
+    try{
+const users=  await User.find({emailId:userEmail})
+
+if(users.length ===0){
+    res.status(404).send('something went wrong')
+}
+else{
+res.send(users)
+}
+    }
+    catch(err){
+        res.status(400).send('Something went Wrong')
+    }
+    
+
+})
+// feed api or get api for all the users
+app.get('/feed',async(req,res)=>{
+   
+    try{
+const users=  await User.find({})
+
+if(users.length ===0){
+    res.status(404).send('something went wrong')
+}
+else{
+res.send(users)
+}
+    }
+    catch(err){
+        res.status(400).send('Something went Wrong')
+    }
+    
+
+})
 
 connectDB().then(()=>{
     console.log('Database connection is established')
