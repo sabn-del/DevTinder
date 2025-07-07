@@ -22,7 +22,8 @@ const userSchema= new mongoose.Schema({
     password:{
         type:String,
         required:true,
-        minLength:6
+        minLength:6,
+        maxLength:100
     },
     age:{
         type:Number,
@@ -40,10 +41,14 @@ const userSchema= new mongoose.Schema({
     about:{
         type:String,
         default:'This is Default about as',
-        minLength:10
+        minLength:10,
+        maxLength:30
     },
     skills:{
         type:[String]
+    },
+    photoUrl:{
+        type:String
     }
 
 
