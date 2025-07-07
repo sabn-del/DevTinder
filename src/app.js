@@ -97,7 +97,7 @@ app.patch('/user', async (req, res) => {
     const data= req.body
 
     try {
-        const user = await User.findByIdAndUpdate({_id:userId},data); // ✅ pass ID directly
+        const user = await User.findByIdAndUpdate({_id:userId},data,{runValidators:true}); // ✅ pass ID directly
         console.log(data)
         if (!user) {
             return res.status(404).send('User not found');
@@ -106,7 +106,7 @@ app.patch('/user', async (req, res) => {
         res.send('User updated successfully');
     } catch (err) {
         console.error(err);
-        res.status(400).send('Something went wrong');
+        res.status(400).send("Update Failed:"+err.message);
     }
 });
 
