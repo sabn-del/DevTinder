@@ -1,19 +1,64 @@
 const express= require('express');
-const User=require('./modals/user')
+const User=require('./modals/user');
+const {validateSignUpData}= require('./utils/validation')
 
 const connectDB=require('./config/database')
 const app= express();
 app.use(express.json())// middlware to parse json body
-
+const bcrypt = require('bcrypt');
 app.post('/signup',async(req,res)=>{
     //creating new instance  of the user modal
     console.log(req.body,'req.body=====>')
+try{
 
-    const user=new User(req.body)
+    //validation of data
+    validateSignUpData(req)
+    //encrypting the password
+
+    const {firstName,lastName,emailId,password}=req.body;
+    const hashPassword=await bcrypt.hash(password,10);
+    console.log(hashPassword)
+const user=new User({firstName,
+    lastName,
+    emailId,
+    password:hashPassword})
     console.log(user,'user=====>')
     await user.save();
     res.send('user added successfully')
+}
+catch(err){
+    res.status(400).send('ERR:'+err.message)
+}
+    
 })
+// login api
+app.post('/login',async(req,res)=>{
+    //creating new instance  of the user modal
+    console.log(req.body,'req.body=====>')
+try{
+
+    const {emailId,password}=req.body;
+    const user=await User.findOne({emailId:emailId})
+
+    if(!user){
+        throw new Error('Invalid Credntials')
+    }
+    const isPasswordValid= bcrypt.compare(password.user.password)
+    if(isPasswordValid){
+        res.send('Login Successfull')
+    }
+    else{
+        throw new Error("Invalid Crednetials")
+    }
+}
+catch(err){
+    res.status(400).send('ERR:'+err.message)
+}
+    
+})
+
+
+
 // get api for one user
 
 app.get('/user',async(req,res)=>{
@@ -99,7 +144,7 @@ app.patch('/user/:userId', async (req, res) => {
     try {
         const ALLOWED_FIELDS=['photoUrl','age','gender','skills','about']
 
-        const isUpdate_Allowed= Object.keys(data).every((k)=>ALLOWED_FIELDS.includes(k))
+        const isUpdate_Allowed= Object.keys(data).every((k)=>ALLOWED_FIELDS.includes(k))//make emailid, name, not editable, while updating
 
         if(!isUpdate_Allowed){
             throw new Error('Update not allowed')
